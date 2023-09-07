@@ -1,35 +1,37 @@
-pipeline {
-    agent any 
-    
+pipeline{
+    agent any
     stages{
-        stage("Clone Code"){
+        stage("PullCode"){
             steps {
-                echo "Cloning the code"
-                git url:"https://github.com/LondheShubham153/django-notes-app.git", branch: "main"
+                echo "Cloning Source Code"
+                git url: "https://github.com/smobinulla/mobinnotepad.git", branch: "main"
             }
         }
-        stage("Build"){
+        stage("BuildCode"){
             steps {
-                echo "Building the image"
-                sh "docker build -t my-note-app ."
+                echo "Buildin Docker Image"
+                sh "docker build -t mobinnotepad ."
             }
         }
-        stage("Push to Docker Hub"){
+        stage("Push Code to Docker Hub"){
             steps {
-                echo "Pushing the image to docker hub"
-                withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
-                sh "docker tag my-note-app ${env.dockerHubUser}/my-note-app:latest"
+                echo "Pushing Image to DockerHub"
+                withCredentials([usernamePassword(credentialsId:"DockerHub", passwordVariable:"dockerHubPass", usernameVariable:"dockerHubUser")]){
+                sh "docker tag mobinnotepad ${env.dockerHubUser}/mobinnotepad:latest"
                 sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                sh "docker push ${env.dockerHubUser}/my-note-app:latest"
+                sh "docker push ${env.dockerHubUser}/mobinnotepad:latest"    
                 }
-            }
-        }
-        stage("Deploy"){
-            steps {
-                echo "Deploying the container"
-                sh "docker-compose down && docker-compose up -d"
                 
             }
         }
+        stage("DeployCode"){
+            steps {
+                echo "Deploying Notepad App"
+                sh "docker-compose down && docker-compose up -d"
+            }
+            
+        }
+        
     }
-}
+    
+} 
